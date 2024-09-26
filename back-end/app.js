@@ -4,6 +4,8 @@ const morgan = require('morgan') // middleware for nice logging of incoming HTTP
 const cors = require('cors') // middleware for enabling CORS (Cross-Origin Resource Sharing) requests.
 const mongoose = require('mongoose')
 
+const port = process.env.PORT || 3000
+
 const app = express() // instantiate an Express object
 app.use(morgan('dev', { skip: (req, res) => process.env.NODE_ENV === 'test' })) // log all incoming requests, except when in unit test mode.  morgan has a few logging default styles - dev is a nice concise color-coded style
 app.use(cors()) // allow cross-origin resource sharing
@@ -11,6 +13,7 @@ app.use(cors()) // allow cross-origin resource sharing
 // use express's builtin body-parser middleware to parse any data included in a request
 app.use(express.json()) // decode JSON-formatted incoming POST data
 app.use(express.urlencoded({ extended: true })) // decode url-encoded incoming POST data
+app.use('/images', express.static('public/images'))
 
 // connect to database
 mongoose
@@ -38,6 +41,15 @@ app.get('/messages', async (req, res) => {
       status: 'failed to retrieve messages from the database',
     })
   }
+})
+
+app.get('/about', async (req, res) => {
+    res.json({
+      name: 'Phillip Wong',
+      url: `http://localhost:${port}/images/IMG_0745.jpeg`,
+      description: "Hi, I'm Phillip Wong, and I'm a senior in college majoring in computer science. My time in college has been amazing, especially in classes like algorithms and software development. It's been challenging, but I've learned a lot. I also love playing table tennis, which keeps me active and lets me hang out with friends. Competing in tournaments has taught me discipline and teamwork.I've been involved in coding clubs and hackathons, which have fueled my passion for problem-solving. I even started a personal project, a web app to help users track their fitness goals. As I prepare to graduate, I'm excited to see what comes next—whether it's software development or starting my own project!",
+      status: 'all good',
+    })
 })
 
 // a route to handle fetching a single message by its id
